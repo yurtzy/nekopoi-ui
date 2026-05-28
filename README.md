@@ -14,7 +14,7 @@ built strictly following minimal "nudity" visual principles:
 ### live
 
 - API: [https://nekopoi-api-yurtzy.vercel.app/](https://nekopoi-api-yurtzy.vercel.app/)
-- UI: [https://nekopoi-ui.vercel.app/](https://nekopoi-ui.vercel.app/) (or the canonical vercel deployment link)
+- UI: [https://nekopoi-ui-yurtzy.vercel.app/](https://nekopoi-ui-yurtzy.vercel.app/)
 
 ### usage
 
