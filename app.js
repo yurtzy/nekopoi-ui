@@ -734,7 +734,6 @@ window.toggleAdShield = function() {
         const newIframe = document.createElement('iframe');
         newIframe.className = iframe.className;
         newIframe.id = iframe.id;
-        newIframe.src = iframe.src;
         newIframe.frameBorder = iframe.frameBorder;
         if (iframe.hasAttribute('allowfullscreen')) {
             newIframe.setAttribute('allowfullscreen', '');
@@ -745,7 +744,14 @@ window.toggleAdShield = function() {
             newIframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-presentation');
         }
         
+        // Reset src context to about:blank first, then load the target URL after a tiny timeout to completely clear browser sandbox state
+        const targetSrc = iframe.src;
+        newIframe.src = 'about:blank';
         parent.replaceChild(newIframe, iframe);
+        
+        setTimeout(() => {
+            newIframe.src = targetSrc;
+        }, 50);
     }
     
     // Instantly update the Ad-Shield toggle UI row
