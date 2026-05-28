@@ -23,14 +23,16 @@ async function loadLatest() {
     if (!data) return;
     
     let html = `<div style="margin-bottom: 2rem; opacity: 0.6; text-transform: lowercase;">latest updates</div><div class="grid">`;
-    data.forEach(item => {
-        html += `
-        <div class="card" onclick="loadDetail('${item.url}')">
-            <div class="card-img" style="background-image: url('${item.thumbnail || ''}')"></div>
-            <div class="card-title">${item.title}</div>
-            <div class="card-meta">${item.date || ''}</div>
-        </div>`;
-    });
+    if (data.results) {
+        data.results.forEach(item => {
+            html += `
+            <div class="card" onclick="loadDetail('${item.url}')">
+                <div class="card-img" style="background-image: url('${item.thumbnail || ''}')"></div>
+                <div class="card-title">${item.title}</div>
+                <div class="card-meta">${item.date || ''}</div>
+            </div>`;
+        });
+    }
     html += `</div>`;
     container.innerHTML = html;
 }
