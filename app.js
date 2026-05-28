@@ -615,7 +615,7 @@ async function loadDetail(url) {
                 </script>`;
             } else {
                 // Standard iframe fallback
-                const sandboxAttr = state.adShield ? 'sandbox="allow-scripts allow-same-origin allow-presentation"' : '';
+                const sandboxAttr = state.adShield ? 'sandbox="allow-scripts allow-same-origin allow-presentation allow-forms allow-pointer-lock allow-popups"' : '';
                 html += `
                 <iframe class="video-frame" id="iframe-player" src="${mainStream.url}" frameborder="0" allowfullscreen allow="autoplay; encrypted-media; fullscreen" ${sandboxAttr}></iframe>`;
             }
@@ -718,7 +718,7 @@ window.switchStreamServer = function(btnEl, serverPayload) {
         }
     } else {
         // Embed standard iframe fallback
-        const sandboxAttr = state.adShield ? 'sandbox="allow-scripts allow-same-origin allow-presentation"' : '';
+        const sandboxAttr = state.adShield ? 'sandbox="allow-scripts allow-same-origin allow-presentation allow-forms allow-pointer-lock allow-popups"' : '';
         wrapper.innerHTML = `
         <iframe class="video-frame" id="iframe-player" src="${serverObj.url}" frameborder="0" allowfullscreen allow="autoplay; encrypted-media; fullscreen" ${sandboxAttr}></iframe>`;
     }
@@ -741,7 +741,7 @@ window.toggleAdShield = function() {
         newIframe.setAttribute('allow', 'autoplay; encrypted-media; fullscreen');
         
         if (state.adShield) {
-            newIframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-presentation');
+            newIframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-presentation allow-forms allow-pointer-lock allow-popups');
         }
         
         // Reset src context to about:blank first, then load the target URL after a tiny timeout to completely clear browser sandbox state
