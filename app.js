@@ -726,8 +726,40 @@ window.switchStreamServer = function(btnEl, serverPayload) {
 
 window.toggleAdShield = function() {
     state.adShield = !state.adShield;
-    if (state.activeDetailUrl) {
-        loadDetail(state.activeDetailUrl);
+    
+    // Dynamically rebuild the iframe in the DOM to apply/remove the sandbox instantly without API re-fetch
+    const iframe = document.getElementById('iframe-player');
+    if (iframe) {
+        const parent = iframe.parentNode;
+        const newIframe = document.createElement('iframe');
+        newIframe.className = iframe.className;
+        newIframe.id = iframe.id;
+        newIframe.src = iframe.src;
+        newIframe.frameBorder = iframe.frameBorder;
+        if (iframe.hasAttribute('allowfullscreen')) {
+            newIframe.setAttribute('allowfullscreen', '');
+        }
+        newIframe.setAttribute('allow', 'autoplay; encrypted-media; fullscreen');
+        
+        if (state.adShield) {
+            newIframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-presentation');
+        }
+        
+        parent.replaceChild(newIframe, iframe);
+    }
+    
+    // Instantly update the Ad-Shield toggle UI row
+    const shieldRow = document.querySelector('.ad-shield-row');
+    if (shieldRow) {
+        shieldRow.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: var(--text-sub);">
+            <i class="fa-solid fa-shield-halved" style="color: ${state.adShield ? 'var(--accent)' : '#94a3b8'}; transition: color 0.2s;"></i>
+            <span><strong>Ad-Block Shield</strong> ${state.adShield ? '(Safe Mode)' : '(Disabled - Ads allowed)'}</span>
+        </div>
+        <button class="btn-dir-select ${state.adShield ? 'active' : ''}" onclick="toggleAdShield()" style="padding: 0.3rem 0.8rem; font-size: 0.75rem; border-radius: 4px; border: 1px solid ${state.adShield ? 'var(--accent)' : 'var(--border)'}; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+            ${state.adShield ? 'disable ad shield' : 'enable ad shield'}
+        </button>
+        `;
     }
 };
 
