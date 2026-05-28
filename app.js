@@ -12,14 +12,15 @@ const searchBtn = document.getElementById('search-btn');
 
 // App State
 let state = {
-    view: 'home', // home, directory, genres, schedule, watchlist, history, search, detail, category
+    view: 'home', // home, directory, genres, schedule, watchlist, history, search, detail, category, hentai, jav
     page: 1,
     query: '',
     categoryName: '',
     letter: '',
     dirType: 'jav', // 'jav' or 'hentai'
     activeDetailUrl: '',
-    hasNextPage: false
+    hasNextPage: false,
+    adShield: true
 };
 
 // LocalStorage Keys
@@ -614,11 +615,25 @@ async function loadDetail(url) {
                 </script>`;
             } else {
                 // Standard iframe fallback
+                const sandboxAttr = state.adShield ? 'sandbox="allow-scripts allow-same-origin allow-presentation"' : '';
                 html += `
-                <iframe class="video-frame" id="iframe-player" src="${mainStream.url}" frameborder="0" allowfullscreen allow="autoplay; encrypted-media; fullscreen" sandbox="allow-scripts allow-same-origin allow-presentation"></iframe>`;
+                <iframe class="video-frame" id="iframe-player" src="${mainStream.url}" frameborder="0" allowfullscreen allow="autoplay; encrypted-media; fullscreen" ${sandboxAttr}></iframe>`;
             }
 
             html += `</div>`; // Close player-wrapper
+
+            // Ad Shield Toggle row
+            html += `
+            <div class="ad-shield-row" style="margin-top: 1rem; display: flex; align-items: center; justify-content: space-between; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border); padding: 0.6rem 1rem; border-radius: 8px;">
+                <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: var(--text-sub);">
+                    <i class="fa-solid fa-shield-halved" style="color: ${state.adShield ? 'var(--accent)' : '#94a3b8'}; transition: color 0.2s;"></i>
+                    <span><strong>Ad-Block Shield</strong> ${state.adShield ? '(Safe Mode)' : '(Disabled - Ads allowed)'}</span>
+                </div>
+                <button class="btn-dir-select ${state.adShield ? 'active' : ''}" onclick="toggleAdShield()" style="padding: 0.3rem 0.8rem; font-size: 0.75rem; border-radius: 4px; border: 1px solid ${state.adShield ? 'var(--accent)' : 'var(--border)'}; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+                    ${state.adShield ? 'disable ad shield' : 'enable ad shield'}
+                </button>
+            </div>
+            `;
 
             // Server Selection pills
             if (data.streamServers.length > 1) {
@@ -703,8 +718,16 @@ window.switchStreamServer = function(btnEl, serverPayload) {
         }
     } else {
         // Embed standard iframe fallback
+        const sandboxAttr = state.adShield ? 'sandbox="allow-scripts allow-same-origin allow-presentation"' : '';
         wrapper.innerHTML = `
-        <iframe class="video-frame" id="iframe-player" src="${serverObj.url}" frameborder="0" allowfullscreen allow="autoplay; encrypted-media; fullscreen" sandbox="allow-scripts allow-same-origin allow-presentation"></iframe>`;
+        <iframe class="video-frame" id="iframe-player" src="${serverObj.url}" frameborder="0" allowfullscreen allow="autoplay; encrypted-media; fullscreen" ${sandboxAttr}></iframe>`;
+    }
+};
+
+window.toggleAdShield = function() {
+    state.adShield = !state.adShield;
+    if (state.activeDetailUrl) {
+        loadDetail(state.activeDetailUrl);
     }
 };
 
