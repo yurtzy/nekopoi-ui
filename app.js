@@ -23,8 +23,11 @@ async function loadLatest() {
     if (!data) return;
     
     let html = `<div style="margin-bottom: 2rem; opacity: 0.6; text-transform: lowercase;">latest updates</div><div class="grid">`;
-    if (data.results) {
-        data.results.forEach(item => {
+    // sometimes it's directly an array if the scraper returns array, sometimes it has a .results wrapper
+    const items = Array.isArray(data) ? data : data.results;
+    
+    if (items) {
+        items.forEach(item => {
             html += `
             <div class="card" onclick="loadDetail('${item.url}')">
                 <div class="card-img" style="background-image: url('${item.thumbnail || ''}')"></div>
