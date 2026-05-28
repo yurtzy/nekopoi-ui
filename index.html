@@ -3,26 +3,100 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>nekopoi</title>
+    <title>nekopoi. — premium anime hub</title>
+    <!-- Google Fonts: Outfit (Brand & Headings) and Inter (UI Text) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- FontAwesome CDN for premium icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- Hls.js CDN for ad-free direct streaming -->
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.12/dist/hls.min.js"></script>
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
+    <!-- Premium Glassmorphic Navigation -->
     <header class="navbar">
-      <div class="brand" onclick="navigate('home')">nekopoi.</div>
-      <div class="search-box">
-        <input
-          type="text"
-          id="search-input"
-          placeholder="search"
-          aria-label="search"
-        />
-        <button id="search-btn">_</button>
+      <div class="nav-left">
+        <div class="brand" onclick="navigate('home')">nekopoi<span class="dot">.</span></div>
+      </div>
+      
+      <!-- Center Tab Navigation -->
+      <nav class="nav-tabs">
+        <button class="nav-tab active" data-view="home" onclick="navigate('home')">
+          <i class="fa-solid fa-fire"></i> <span>latest</span>
+        </button>
+        <button class="nav-tab" data-view="directory" onclick="navigate('directory')">
+          <i class="fa-solid fa-list-ul"></i> <span>directory</span>
+        </button>
+        <button class="nav-tab" data-view="genres" onclick="navigate('genres')">
+          <i class="fa-solid fa-tags"></i> <span>genres</span>
+        </button>
+        <button class="nav-tab" data-view="schedule" onclick="navigate('schedule')">
+          <i class="fa-solid fa-calendar-days"></i> <span>schedule</span>
+        </button>
+        <button class="nav-tab" data-view="watchlist" onclick="navigate('watchlist')">
+          <i class="fa-solid fa-bookmark"></i> <span>watchlist</span>
+        </button>
+        <button class="nav-tab" data-view="history" onclick="navigate('history')">
+          <i class="fa-solid fa-clock-rotate-left"></i> <span>history</span>
+        </button>
+      </nav>
+
+      <!-- Right Actions: Search Box -->
+      <div class="nav-right">
+        <div class="search-box">
+          <input
+            type="text"
+            id="search-input"
+            placeholder="search titles..."
+            aria-label="search"
+          />
+          <button id="search-btn" class="search-action-btn">
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </button>
+        </div>
       </div>
     </header>
 
+    <!-- App Container -->
     <main id="app-container">
-      <div class="loading">initializing...</div>
+      <!-- High-fidelity Skeleton Loader on Initialization -->
+      <div class="skeleton-container">
+        <div class="skeleton-title"></div>
+        <div class="skeleton-grid">
+          <div class="skeleton-card">
+            <div class="skeleton-img"></div>
+            <div class="skeleton-line short"></div>
+            <div class="skeleton-line"></div>
+          </div>
+          <div class="skeleton-card">
+            <div class="skeleton-img"></div>
+            <div class="skeleton-line short"></div>
+            <div class="skeleton-line"></div>
+          </div>
+          <div class="skeleton-card">
+            <div class="skeleton-img"></div>
+            <div class="skeleton-line short"></div>
+            <div class="skeleton-line"></div>
+          </div>
+          <div class="skeleton-card">
+            <div class="skeleton-img"></div>
+            <div class="skeleton-line short"></div>
+            <div class="skeleton-line"></div>
+          </div>
+        </div>
+      </div>
     </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <div class="footer-content">
+        <div class="footer-logo">nekopoi<span class="dot">.</span></div>
+        <p class="footer-text">designed beautifully. powered by high-speed scrape api.</p>
+        <div class="footer-meta">yurtzy &copy; 2026</div>
+      </div>
+    </footer>
 
     <script src="app.js"></script>
   </body>
