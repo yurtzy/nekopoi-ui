@@ -225,10 +225,17 @@ async function loadGenres() {
 
 // 4. View: Category/Genre Detail Listing (Paginated)
 async function loadCategory(catSlug, catName, page = 1) {
-    state.view = 'category';
+    if (catSlug === 'hentai') {
+        state.view = 'hentai';
+    } else if (catSlug === 'jav') {
+        state.view = 'jav';
+    } else {
+        state.view = 'category';
+    }
     state.categoryName = catSlug;
     state.query = catName;
     state.page = page;
+    syncNavbarTabs();
     showSkeletons();
 
     const data = await api(`/category/${catSlug}?page=${page}`);
@@ -236,14 +243,20 @@ async function loadCategory(catSlug, catName, page = 1) {
 
     state.hasNextPage = data.hasNextPage;
 
+    let backBarHtml = '';
+    if (state.view === 'category') {
+        backBarHtml = `
+        <div class="detail-back-bar">
+            <button class="btn-back" onclick="navigate('genres')">
+                <i class="fa-solid fa-arrow-left-long"></i> return to genres
+            </button>
+        </div>`;
+    }
+
     let html = `
-    <div class="detail-back-bar">
-        <button class="btn-back" onclick="navigate('genres')">
-            <i class="fa-solid fa-arrow-left-long"></i> return to genres
-        </button>
-    </div>
-    <div class="section-header" style="margin-top: 1rem;">
-        <h2 class="section-title">genre: ${catName}</h2>
+    ${backBarHtml}
+    <div class="section-header" style="margin-top: ${state.view === 'category' ? '1rem' : '0.5rem'};">
+        <h2 class="section-title">${catName} releases</h2>
         <span class="card-meta">page ${page}</span>
     </div>
     <div class="grid">`;
@@ -602,7 +615,7 @@ async function loadDetail(url) {
             } else {
                 // Standard iframe fallback
                 html += `
-                <iframe class="video-frame" id="iframe-player" src="${mainStream.url}" frameborder="0" allowfullscreen></iframe>`;
+                <iframe class="video-frame" id="iframe-player" src="${mainStream.url}" frameborder="0" allowfullscreen allow="autoplay; encrypted-media; fullscreen" sandbox="allow-scripts allow-same-origin allow-presentation"></iframe>`;
             }
 
             html += `</div>`; // Close player-wrapper
@@ -691,7 +704,7 @@ window.switchStreamServer = function(btnEl, serverPayload) {
     } else {
         // Embed standard iframe fallback
         wrapper.innerHTML = `
-        <iframe class="video-frame" id="iframe-player" src="${serverObj.url}" frameborder="0" allowfullscreen></iframe>`;
+        <iframe class="video-frame" id="iframe-player" src="${serverObj.url}" frameborder="0" allowfullscreen allow="autoplay; encrypted-media; fullscreen" sandbox="allow-scripts allow-same-origin allow-presentation"></iframe>`;
     }
 };
 
@@ -815,6 +828,12 @@ window.navigate = function(view) {
     if (view === 'home') {
         history.pushState({ page: 'home' }, '', '?home');
         loadLatest(1);
+    } else if (view === 'hentai') {
+        history.pushState({ page: 'hentai' }, '', '?hentai');
+        loadCategory('hentai', 'Hentai', 1);
+    } else if (view === 'jav') {
+        history.pushState({ page: 'jav' }, '', '?jav');
+        loadCategory('jav', 'JAV', 1);
     } else if (view === 'directory') {
         history.pushState({ page: 'directory' }, '', '?directory');
         loadDirectory('jav');
@@ -863,6 +882,10 @@ function handleUrlRouting() {
         const q = params.get('search');
         searchInput.value = q;
         loadSearch(q, 1);
+    } else if (params.has('hentai')) {
+        loadCategory('hentai', 'Hentai', 1);
+    } else if (params.has('jav')) {
+        loadCategory('jav', 'JAV', 1);
     } else if (params.has('directory')) {
         loadDirectory('jav');
     } else if (params.has('genres')) {
