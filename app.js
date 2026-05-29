@@ -10,6 +10,19 @@ const container = document.getElementById('app-container');
 const searchInput = document.getElementById('search-input');
 const searchBtn = document.getElementById('search-btn');
 
+// Premium View Counter Utility Functions
+function hashCode(str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+        hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return hash;
+}
+
+function formatNumber(num) {
+    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
 // App State
 let state = {
     view: 'home', // home, directory, genres, schedule, watchlist, history, search, detail, category, hentai, jav
@@ -502,13 +515,25 @@ async function loadDetail(url) {
     syncNavbarTabs();
     showSpinner();
 
+    // Persist details routing in browser history
+    if (window.location.search !== `?video=${encodeURIComponent(url)}`) {
+        history.pushState({ page: 'detail', url }, '', `?video=${encodeURIComponent(url)}`);
+    }
+
     const data = await api(`/detail?url=${encodeURIComponent(url)}`);
     if (!data) return;
+
+    // Update document/tab title dynamically
+    document.title = `${data.title} — nekopoi.`;
 
     // Save to Watch/Clicked history
     saveToWatchHistory(data, url);
 
     const isBookmarked = checkIsBookmarked(url);
+
+    // Calculate seeded views count
+    const baseViews = Math.abs(hashCode(url)) % 6000 + 1500;
+    const totalViews = baseViews + (data.views || 0);
 
     let html = `
     <div class="detail-view">
@@ -535,7 +560,11 @@ async function loadDetail(url) {
             <div class="detail-content">
                 <div class="detail-header">
                     <h1 class="detail-title">${data.title}</h1>
-                    <div class="detail-metadata-tags">`;
+                    <div class="detail-metadata-tags">
+                        <div class="metadata-tag">
+                            <i class="fa-solid fa-eye" style="color: var(--accent); margin-right: 0.3rem;"></i>
+                            <strong>views:</strong> ${formatNumber(totalViews)}
+                        </div>`;
 
     if (data.metadata) {
         for (const [k, v] of Object.entries(data.metadata)) {
@@ -588,6 +617,10 @@ async function loadDetail(url) {
             
             html += `
             <div class="video-section">
+                <div class="now-playing-banner" style="background: linear-gradient(135deg, rgba(233, 121, 145, 0.1) 0%, rgba(233, 121, 145, 0.02) 100%); border-left: 4px solid var(--accent); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; display: flex; flex-direction: column; gap: 0.2rem;">
+                    <span style="font-size: 0.7rem; color: var(--accent); font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px;"><i class="fa-solid fa-play" style="margin-right: 0.3rem;"></i> now playing</span>
+                    <span style="font-size: 1.05rem; color: var(--text-main); font-weight: 600; line-height: 1.4;">${data.title}</span>
+                </div>
                 <div class="section-header">
                     <h3 class="section-title" style="font-size: 1.4rem;">media player</h3>
                 </div>
@@ -771,13 +804,19 @@ window.toggleAdShield = function() {
 
 // Simple History Routing GoBack Control
 function goBackFromDetail() {
+    // Reset tab title
+    document.title = 'nekopoi. — premium anime hub';
+
     if (state.query) {
         if (state.view === 'category' || state.categoryName) {
+            history.pushState({ page: 'category', catSlug: state.categoryName, catName: state.query }, '', `?${state.categoryName}`);
             loadCategory(state.categoryName, state.query, state.page);
         } else {
+            history.pushState({ page: 'search', q: state.query }, '', `?search=${encodeURIComponent(state.query)}`);
             loadSearch(state.query, state.page);
         }
     } else {
+        history.pushState({ page: 'home' }, '', '?home');
         loadLatest(state.page);
     }
 }
@@ -939,26 +978,37 @@ window.addEventListener('popstate', (e) => {
 
 function handleUrlRouting() {
     const params = new URLSearchParams(window.location.search);
-    if (params.has('search')) {
+    if (params.has('video')) {
+        loadDetail(params.get('video'));
+    } else if (params.has('search')) {
         const q = params.get('search');
         searchInput.value = q;
         loadSearch(q, 1);
+        document.title = 'nekopoi. — premium anime hub';
     } else if (params.has('hentai')) {
         loadCategory('hentai', 'Hentai', 1);
+        document.title = 'Hentai Releases — nekopoi.';
     } else if (params.has('jav')) {
         loadCategory('jav', 'JAV', 1);
+        document.title = 'JAV Releases — nekopoi.';
     } else if (params.has('directory')) {
         loadDirectory('jav');
+        document.title = 'Directory — nekopoi.';
     } else if (params.has('genres')) {
         loadGenres();
+        document.title = 'Genres — nekopoi.';
     } else if (params.has('schedule')) {
         loadSchedule();
+        document.title = 'Schedule — nekopoi.';
     } else if (params.has('watchlist')) {
         loadWatchlist();
+        document.title = 'Watchlist — nekopoi.';
     } else if (params.has('history')) {
         loadHistory();
+        document.title = 'History — nekopoi.';
     } else {
         loadLatest(1);
+        document.title = 'nekopoi. — premium anime hub';
     }
 }
 
