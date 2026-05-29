@@ -20,7 +20,7 @@ let state = {
     dirType: 'jav', // 'jav' or 'hentai'
     activeDetailUrl: '',
     hasNextPage: false,
-    adShield: true
+    adShield: false
 };
 
 // LocalStorage Keys
